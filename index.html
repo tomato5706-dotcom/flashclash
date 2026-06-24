@@ -2,40 +2,231 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlashClash Web App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FlashClash Pro</title>
     <style>
-        body { background-color: #f4f7f6; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
-        .container { width: 100%; max-width: 600px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 35px 30px; text-align: center; box-sizing: border-box; }
+        /* Modern Premium Dark Theme Variables */
+        :root {
+            --bg-main: #0f172a;       /* Deep Slate Black */
+            --bg-card: #1e293b;       /* Dark Navy Card Base */
+            --border-glow: #334155;   /* Subtle Border */
+            --text-primary: #f8fafc;  /* Clean Off-White */
+            --text-muted: #94a3b8;    /* Muted Blue-Grey */
+            --accent-blue: #38bdf8;   /* Electric Sky Blue */
+            --accent-hover: #0284c7;  /* Deep Sky Blue */
+            --bg-command: #0b0f19;    /* Pure Black for monospace answer box */
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body { 
+            background-color: var(--bg-main); 
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 16px; 
+        }
+
+        .container { 
+            width: 100%; 
+            max-width: 440px; 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-glow);
+            border-radius: 16px; 
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            padding: 30px 24px; 
+            text-align: center; 
+        }
         
         /* Menu Screen Styling */
-        .menu-title { color: #2d3748; margin-bottom: 30px; font-size: 1.8rem; font-weight: bold; }
-        .quiz-link-btn { display: block; background: white; border: 1px solid #e2e8f0; color: #4a5568; padding: 16px 20px; margin-bottom: 12px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1.05rem; text-align: left; cursor: pointer; transition: all 0.2s; }
-        .quiz-link-btn:hover { background: #edf2f7; border-color: #cbd5e0; }
+        .menu-title { 
+            color: var(--text-primary); 
+            margin-bottom: 24px; 
+            font-size: 1.6rem; 
+            font-weight: 800; 
+            letter-spacing: -0.5px;
+        }
+
+        .menu-title span {
+            color: var(--accent-blue);
+        }
+
+        .quiz-link-btn { 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid var(--border-glow); 
+            color: var(--text-primary); 
+            padding: 18px 20px; 
+            margin-bottom: 14px; 
+            border-radius: 12px; 
+            font-weight: 600; 
+            font-size: 1.05rem; 
+            text-align: left; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            width: 100%;
+        }
+
+        .quiz-link-btn:active { 
+            background: rgba(56, 189, 248, 0.1); 
+            border-color: var(--accent-blue); 
+            transform: scale(0.98);
+        }
         
-        /* Flashcard Screen Styling (Hidden by Default) */
-        #flashcard-screen { display: none; width: 100%; }
-        .back-link { display: inline-block; margin-bottom: 20px; color: #718096; text-decoration: none; font-weight: bold; cursor: pointer; background: none; border: none; font-size: 1rem; }
-        .progress { font-size: 0.85rem; font-weight: 600; color: #718096; margin-bottom: 15px; background: #f4f7f6; padding: 4px 12px; border-radius: 20px; display: inline-block; }
-        .question-box { font-size: 1.25rem; font-weight: 500; margin-bottom: 30px; min-height: 60px; display: flex; align-items: center; justify-content: center; color: #2d3748; }
-        .answer-box { margin-bottom: 30px; min-height: 64px; display: flex; align-items: center; justify-content: center; }
-        .redacted-btn { background: #4a5568; color: white; border: none; padding: 12px 24px; font-size: 0.95rem; font-weight: 600; border-radius: 6px; cursor: pointer; }
-        .revealed-command { font-family: monospace; background: #1a202c; color: #38bdf8; padding: 14px 28px; border-radius: 6px; font-size: 1.2rem; font-weight: bold; display: none; }
-        .nav-buttons { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid #e2e8f0; padding-top: 25px; }
-        .nav-btn { background: transparent; border: 1px solid #e2e8f0; padding: 10px 16px; border-radius: 6px; cursor: pointer; flex: 1; font-size: 0.95rem; }
-        .nav-btn.shuffle { background: #0284c7; color: white; border: none; }
+        /* Flashcard Screen Styling */
+        #flashcard-screen { display: none; width: 100%; max-width: 440px; }
+        
+        .back-link { 
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 16px; 
+            color: var(--text-muted); 
+            text-decoration: none; 
+            font-weight: 600; 
+            cursor: pointer; 
+            background: none; 
+            border: none; 
+            font-size: 0.95rem; 
+            padding: 8px 0;
+        }
+
+        .back-link:active {
+            color: var(--text-primary);
+        }
+
+        .progress { 
+            font-size: 0.8rem; 
+            font-weight: 700; 
+            color: var(--accent-blue); 
+            margin-bottom: 20px; 
+            background: rgba(56, 189, 248, 0.1); 
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            display: inline-block; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .question-box { 
+            font-size: 1.35rem; 
+            font-weight: 600; 
+            line-height: 1.5;
+            margin-bottom: 30px; 
+            min-height: 90px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--text-primary); 
+        }
+
+        .answer-box { 
+            margin-bottom: 35px; 
+            min-height: 70px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+
+        .redacted-btn { 
+            background: var(--accent-blue); 
+            color: var(--bg-main); 
+            border: none; 
+            padding: 14px 28px; 
+            font-size: 1rem; 
+            font-weight: 700; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
+            transition: background 0.15s ease;
+        }
+
+        .redacted-btn:active { 
+            background: var(--accent-hover); 
+        }
+
+        .revealed-command { 
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; 
+            background: var(--bg-command); 
+            color: var(--accent-blue); 
+            padding: 16px; 
+            border-radius: 10px; 
+            font-size: 1.2rem; 
+            font-weight: 700; 
+            display: none; 
+            width: 100%;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            word-break: break-word;
+        }
+
+        .nav-buttons { 
+            display: flex; 
+            justify-content: space-between; 
+            gap: 12px; 
+            border-top: 1px solid var(--border-glow); 
+            padding-top: 25px; 
+        }
+
+        .nav-btn { 
+            background: rgba(255, 255, 255, 0.02); 
+            border: 1px solid var(--border-glow); 
+            color: var(--text-primary);
+            padding: 14px 16px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            flex: 1; 
+            font-size: 0.95rem; 
+            font-weight: 600;
+        }
+
+        .nav-btn:active:not(:disabled) {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+        }
+
+        .nav-btn.shuffle { 
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--border-glow);
+            color: var(--text-muted);
+            flex: 0.8;
+        }
+        
+        .nav-btn.shuffle:active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
     </style>
 </head>
 <body>
 
     <div class="container" id="menu-screen">
-        <div class="menu-title">📁 Study Portal</div>
-        <button class="quiz-link-btn" onclick="startDeck('set1')">📁 Set 1: Navigation (5 Qs)</button>
-        <button class="quiz-link-btn" onclick="startDeck('set4')">📁 Set 4: India States & Capitals (36 Qs)</button>
+        <div class="menu-title">FlashClash <span>Portal</span></div>
+        <button class="quiz-link-btn" onclick="startDeck('set1')">
+            <span>📁 Set 1: Navigation</span>
+            <span style="color: var(--text-muted); font-size: 0.85rem;">5 Qs →</span>
+        </button>
+        <button class="quiz-link-btn" onclick="startDeck('set4')">
+            <span>📁 Set 4: India States & UTs</span>
+            <span style="color: var(--text-muted); font-size: 0.85rem;">36 Qs →</span>
+        </button>
     </div>
 
     <div id="flashcard-screen">
-        <button class="back-link" onclick="showMenu()">⬅️ Back to Main Menu</button>
+        <button class="back-link" onclick="showMenu()">🏠 Back to Portals</button>
         <div class="container">
             <div class="progress" id="progress-tracker">Question 1 of 5</div>
             <div class="question-box" id="question-text">Loading...</div>
@@ -44,15 +235,14 @@
                 <div class="revealed-command" id="answer-text"></div>
             </div>
             <div class="nav-buttons">
-                <button class="nav-btn" id="prev-btn" onclick="changeQuestion(-1)">Previous</button>
-                <button class="nav-btn shuffle" onclick="shuffleQuestions()">🔀 Shuffle</button>
+                <button class="nav-btn" id="prev-btn" onclick="changeQuestion(-1)">Prev</button>
+                <button class="nav-btn shuffle" onclick="shuffleQuestions()">🔀</button>
                 <button class="nav-btn" id="next-btn" onclick="changeQuestion(1)">Next</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- ALL DECK DATA HOUSED HERE ---
         const decks = {
             set1: [
                 { question: "To display all the files and directories", answer: "DIR" },
@@ -62,7 +252,6 @@
                 { question: "Who is the great Boss of 1975", answer: "B.Samuel Soren" }
             ],
             set4: [
-                // --- 28 STATES ---
                 { question: "State: Andhra Pradesh", answer: "Amaravati" },
                 { question: "State: Arunachal Pradesh", answer: "Itanagar" },
                 { question: "State: Assam", answer: "Dispur" },
@@ -91,29 +280,25 @@
                 { question: "State: Uttar Pradesh", answer: "Lucknow" },
                 { question: "State: Uttarakhand", answer: "Dehradun" },
                 { question: "State: West Bengal", answer: "Kolkata" },
-                // --- 8 UNION TERRITORIES ---
                 { question: "Union Territory: Andaman & Nicobar Islands", answer: "Sri Vijaya Puram" },
                 { question: "Union Territory: Chandigarh", answer: "Chandigarh" },
                 { question: "Union Territory: Dadra & Nagar Haveli and Daman & Diu", answer: "Daman" },
                 { question: "Union Territory: Delhi", answer: "New Delhi" },
-                { question: "Union Territory: Jammu and Kashmir", answer: "Srinagar (Summer) / Jammu (Winter)" },
+                { question: "Union Territory: Jammu and Kashmir", answer: "Srinagar / Jammu" },
                 { question: "Union Territory: Lakshadweep", answer: "Kavaratti" },
                 { question: "Union Territory: Puducherry", answer: "Puducherry" },
-                { question: "Union Territory: Ladakh", answer: "Leh (Summer) / Kargil (Winter)" }
+                { question: "Union Territory: Ladakh", answer: "Leh / Kargil" }
             ]
         };
 
         let activeDeck = [];
         let currentIndex = 0;
 
-        // --- SCREEN NAVIGATION ---
         function startDeck(deckName) {
-            activeDeck = [...decks[deckName]]; // Copy selected deck data
+            activeDeck = [...decks[deckName]];
             currentIndex = 0;
-            
             document.getElementById("menu-screen").style.display = "none";
             document.getElementById("flashcard-screen").style.display = "block";
-            
             loadQuestion(currentIndex);
         }
 
@@ -122,7 +307,6 @@
             document.getElementById("menu-screen").style.display = "block";
         }
 
-        // --- GAMEPLAY CORE LOGIC ---
         function loadQuestion(index) {
             document.getElementById("progress-tracker").innerText = `Question ${index + 1} of ${activeDeck.length}`;
             document.getElementById("question-text").innerText = activeDeck[index].question;
