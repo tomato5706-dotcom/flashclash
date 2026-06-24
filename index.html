@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FlashClash Pro</title>
+    <style>
+        /* Modern Premium Dark Theme Variables */
+        :root {
+            --bg-main: #0f172a;       /* Deep Slate Black */
+            --bg-card: #1e293b;       /* Dark Navy Card Base */
+            --border-glow: #334155;   /* Subtle Border */
+            --text-primary: #f8fafc;  /* Clean Off-White */
+            --text-muted: #94a3b8;    /* Muted Blue-Grey */
+            --accent-blue: #38bdf8;   /* Electric Sky Blue */
+            --accent-hover: #0284c7;  /* Deep Sky Blue */
+            --bg-command: #0b0f19;    /* Pure Black for monospace answer box */
+            --accent-green: #10b981;  /* Success Green */
+            --accent-red: #ef4444;    /* Danger Red */
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body { 
+            background-color: var(--bg-main); 
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: space-between; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 16px 16px 40px 16px; 
+        }
+
+        /* Top Header Navigation Container for absolute top positioning */
+        .top-navbar {
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: auto; 
+            padding-top: 8px;
+            min-height: 32px;
+        }
+
+        .container { 
+            width: 100%; 
+            max-width: 440px; 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-glow);
+            border-radius: 16px; 
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            padding: 30px 24px; 
+            text-align: center;
+            margin-top: auto; 
+            margin-bottom: auto;
+            position: relative; /* Context for absolute button placement */
+        }
+        
+        /* Menu Screen Styling */
+        .menu-title { 
+            color: var(--text-primary); 
+            margin-bottom: 24px; 
+            font-size: 1.6rem; 
+            font-weight: 800; 
+            letter-spacing: -0.5px;
+        }
+
+        .menu-title span {
+            color: var(--accent-blue);
+        }
+
+        .quiz-link-btn { 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid var(--border-glow); 
+            color: var(--text-primary); 
+            padding: 18px 20px; 
+            margin-bottom: 14px; 
+            border-radius: 12px; 
+            font-weight: 600; 
+            font-size: 1.05rem; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            width: 100%;
+            gap: 4px;
+        }
+
+        .quiz-link-btn.combined {
+            background: rgba(56, 189, 248, 0.08);
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        .quiz-link-btn:active { 
+            background: rgba(56, 189, 248, 0.15); 
+            border-color: var(--accent-blue); 
+            transform: scale(0.98);
+        }
+        
+        /* Flashcard Screen Styling */
+        #flashcard-screen { display: none; width: 100%; max-width: 440px; margin-top: auto; margin-bottom: auto; }
+        
+        .back-link { 
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-muted); 
+            text-decoration: none; 
+            font-weight: 600; 
+            cursor: pointer; 
+            background: none; 
+            border: none; 
+            font-size: 0.95rem; 
+            padding: 6px 0;
+            visibility: hidden; 
+        }
+
+        .back-link:active {
+            color: var(--text-primary);
+        }
+
+        /* Redact Toggle Style */
+        .redact-toggle {
+            font-size: 0.8rem;
+            background: var(--border-glow); 
+            color: var(--text-primary); 
+            border: none;
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-weight: bold;
+        }
+
+        .progress { 
+            font-size: 0.8rem; 
+            font-weight: 700; 
+            color: var(--accent-blue); 
+            margin-bottom: 20px; 
+            background: rgba(56, 189, 248, 0.1); 
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            display: inline-block; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .question-box { 
+            font-size: 1.35rem; 
+            font-weight: 600; 
+            line-height: 1.5;
+            margin-bottom: 30px; 
+            min-height: 90px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--text-primary); 
+            padding: 0 10px;
+        }
+
+        .answer-box { 
+            margin-bottom: 25px; 
+            min-height: 110px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            width: 100%;
+        }
+
+        .redacted-btn { 
+            background: var(--accent-blue); 
+            color: var(--bg-main); 
+            border: none; 
+            padding: 14px 28px; 
+            font-size: 1rem; 
+            font-weight: 700; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
+            transition: background 0.15s ease;
+        }
+
+        .redacted-btn:active { 
+            background: var(--accent-hover); 
+        }
+
+        /* Clean layout setup */
+        .evaluation-layout {
+            display: none;
+            width: 100%;
+            align-items: center;
+        }
+
+        .revealed-command { 
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; 
+            background: var(--bg-command); 
+            color: var(--accent-blue); 
+            padding: 16px; 
+            border-radius: 10px; 
+            font-size: 1.2rem; 
+            font-weight: 700; 
+            flex: 1;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            word-break: break-word;
+            min-height: 102px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Small square red button pinned to top right corner of layout box */
+        .corner-incorrect-btn {
+            display: none;
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 34px;
+            height: 34px;
+            background: var(--accent-red);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 800;
+            font-size: 0.95rem;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+            z-index: 10;
+        }
+
+        .corner-incorrect-btn:active {
+            opacity: 0.8;
+        }
+
+        /* End Success Screen Layout */
+        #completion-screen {
+            display: none;
+            width: 100%;
+            max-width: 440px;
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+
+        .completion-msg {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent-green);
+            margin-bottom: 24px;
+        }
+
+        .nav-buttons { 
+            display: flex; 
+            justify-content: space-between; 
+            gap: 12px; 
+            border-top: 1px solid var(--border-glow); 
+            padding-top: 25px; 
+        }
+
+        .nav-btn { 
+            background: rgba(255, 255, 255, 0.02); 
+            border: 1px solid var(--border-glow); 
+            color: var(--text-primary);
+            padding: 14px 16px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            flex: 1; 
+            font-size: 0.95rem; 
+            font-weight: 600;
+        }
+
+        .nav-btn:active:not(:disabled) {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-navbar">
+        <button id="backBtn" class="back-link" onclick="showMenu()">⬅️ Back to Portals</button>
+        <button id="redactBtn" class="redact-toggle" onclick="toggleRedact()">Redact: ON</button>
+    </div>
+
+    <div class="container" id="menu-screen">
+        <div class="menu-title">FlashClash <span>Portal</span></div>
+        <button class="quiz-link-btn" onclick="startDeck('set1')">
+            <span>📁 Set 1: India GK</span>
+        </button>
+        <button class="quiz-link-btn" onclick="startDeck('set2')">
+            <span>📁 Set 2: World GK</span>
+        </button>
+        <button class="quiz-link-btn combined" onclick="startCombinedDeck()">
+            <span>🔥 View All Combined</span>
+        </button>
+    </div>
+
+    <div id="flashcard-screen">
+        <div class="container">
+            <button class="corner-incorrect-btn" id="incorrect-btn" onclick="markValidation(false)">✕</button>
+
+            <div class="progress" id="progress-tracker"></div>
+            <div class="question-box" id="question-text"></div>
+            
+            <div class="answer-box">
+                <button class="redacted-btn" id="reveal-btn" onclick="revealAnswer()">Reveal Answer</button>
+                
+                <div class="evaluation-layout" id="evaluation-block">
+                    <div class="revealed-command" id="answer-text"></div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" id="prev-btn" onclick="changeQuestion(-1)">Prev</button>
+                <button class="nav-btn" id="next-btn" onclick="handleNextClick()">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="completion-screen">
+        <div class="container">
+            <div class="completion-msg">Completed ✅</div>
+            <button class="quiz-link-btn combined" onclick="showMenu()">
+                <span>Back to Menu</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Links seamlessly to your deck file -->
+    <script src="questions.js"></script>
+
+    <script>
+        let activeDeck = [];
+        let incorrectDeck = [];
+        let currentIndex = 0;
+        let redactMode = true;
+        let currentPhase = 1;
+
+        function toggleRedact() {
+            redactMode = !redactMode;
+            document.getElementById('redactBtn').innerText = redactMode ? "Redact: ON" : "Redact: OFF";
+            if (document.getElementById("flashcard-screen").style.display === "block") {
+                loadQuestion(currentIndex);
+            }
+        }
+
+        function startDeck(deckName) {
+            activeDeck = JSON.parse(JSON.stringify(decks[deckName]));
+            setupInitialRun();
+        }
+
+        function startCombinedDeck() {
+            activeDeck = [...JSON.parse(JSON.stringify(decks.set1)), ...JSON.parse(JSON.stringify(decks.set2))];
+            setupInitialRun();
+        }
+
+        function setupInitialRun() {
+            currentPhase = 1;
+            incorrectDeck = [];
+            activeDeck.forEach(card => card.userEvaluation = null);
+            document.getElementById("completion-screen").style.display = "none";
+            setupDeckDisplay();
+        }
+
+        function setupDeckDisplay() {
+            currentIndex = 0;
+            document.getElementById("menu-screen").style.display = "none";
+            document.getElementById("flashcard-screen").style.display = "block";
+            document.getElementById("backBtn").style.visibility = "visible";
+            loadQuestion(currentIndex);
+        }
+
+        function showMenu() {
+            document.getElementById("flashcard-screen").style.display = "none";
+            document.getElementById("completion-screen").style.display = "none";
+            document.getElementById("menu-screen").style.display = "block";
+            document.getElementById("backBtn").style.visibility = "hidden";
+        }
+
+        function loadQuestion(index) {
+            let labelText = redactMode ? `Phase ${currentPhase} • Card ${index + 1} of ${activeDeck.length}` : `Card ${index + 1} of ${activeDeck.length}`;
+            document.getElementById("progress-tracker").innerText = labelText;
+            document.getElementById("question-text").innerText = activeDeck[index].question;
+            document.getElementById("answer-text").innerText = activeDeck[index].answer;
+            
+            const currentCard = activeDeck[index];
+
+            if (redactMode) {
+                if (currentCard.revealed) {
+                    document.getElementById("reveal-btn").style.display = "none";
+                    document.getElementById("evaluation-block").style.display = "flex";
+                    document.getElementById("incorrect-btn").style.display = "flex"; 
+                    document.getElementById("next-btn").disabled = false;
+                } else {
+                    document.getElementById("reveal-btn").style.display = "block";
+                    document.getElementById("evaluation-block").style.display = "none";
+                    document.getElementById("incorrect-btn").style.display = "none"; 
+                    
+                    if (currentCard.userEvaluation === null) {
+                        document.getElementById("next-btn").disabled = true;
+                    } else {
+                        document.getElementById("next-btn").disabled = false;
+                    }
+                }
+            } else {
+                document.getElementById("reveal-btn").style.display = "none";
+                document.getElementById("evaluation-block").style.display = "flex";
+                document.getElementById("incorrect-btn").style.display = "none"; 
+                document.getElementById("next-btn").disabled = (index === activeDeck.length - 1);
+            }
+            
+            document.getElementById("prev-btn").disabled = (index === 0);
+        }
+
+        function revealAnswer() {
+            activeDeck[currentIndex].revealed = true;
+            loadQuestion(currentIndex);
+        }
+
+        function handleNextClick() {
+            if (redactMode && activeDeck[currentIndex].revealed && activeDeck[currentIndex].userEvaluation === null) {
+                markValidation(true);
+            } else {
+                changeQuestion(1);
+            }
+        }
+
+        function markValidation(isCorrect) {
+            const currentCard = activeDeck[currentIndex];
+            currentCard.userEvaluation = isCorrect;
+            
+            if (currentIndex === activeDeck.length - 1) {
+                evaluatePhaseCompletion();
+            } else {
+                changeQuestion(1);
+            }
+        }
+
+        function evaluatePhaseCompletion() {
+            incorrectDeck = activeDeck.filter(card => card.userEvaluation === false);
+            
+            if (incorrectDeck.length > 0) {
+                activeDeck = incorrectDeck.map(card => {
+                    return { question: card.question, answer: card.answer, revealed: false, userEvaluation: null };
+                });
+                currentPhase++;
+                setupDeckDisplay();
+            } else {
+                document.getElementById("flashcard-screen").style.display = "none";
+                document.getElementById("completion-screen").style.display = "block";
+            }
+        }
+
+        function changeQuestion(dir) { 
+            currentIndex += dir; 
+            loadQuestion(currentIndex); 
+        }
+    </script>
+</body>
+</html>
