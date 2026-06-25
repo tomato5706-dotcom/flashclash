@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlashClash Core Architecture Synchronizer</title>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: -apple-system, system-ui, sans-serif;
+            padding: 16px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+        .wrapper {
+            width: 100%;
+            max-width: 460px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            box-sizing: border-box;
+        }
+        h2 { color: #38bdf8; font-weight: 800; margin-top: 0; font-size: 1.3rem; margin-bottom: 4px;}
+        .subtitle { color: #94a3b8; font-size: 0.8rem; margin-bottom: 16px; }
+        .box-group { margin-bottom: 14px; }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            background: #0b0f19;
+            border: 1px solid #334155;
+            color: #38bdf8;
+            font-family: monospace;
+            padding: 12px;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 0.9rem;
+        }
+        textarea.main-file-box { height: 100px; color: #a7f3d0; }
+        .action-btn {
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 14px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            margin-top: 6px;
+        }
+        .action-btn:active { background: #0284c7; }
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-top: 6px;
+            display: inline-block;
+        }
+        .status-good { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; }
+        .status-bad { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
+        .success-flash {
+            color: #10b981; font-size: 0.9rem; margin-top: 10px; display: none; text-align: center; font-weight: bold;
+            background: rgba(16, 185, 129, 0.1); padding: 8px; border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <h2>Architecture Sync Panel</h2>
+    <div class="subtitle">Surgically add cards and overwrite your files smoothly.</div>
+
+    <div class="box-group">
+        <label>1. Current questions.js Code (Paste full file below)</label>
+        <textarea id="fileBaseInput" class="main-file-box" oninput="verifyDatabaseStructure()" placeholder="Paste entire active questions.js code block here..."></textarea>
+        <div id="validationOutput" class="status-badge status-bad">Engine State: Offline</div>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #334155; margin: 16px 0;">
+
+    <div class="box-group">
+        <label>2. Add New Flashcard</label>
+        <input type="text" id="qInput" placeholder="Type new question..." style="margin-bottom: 8px;">
+        <input type="text" id="aInput" placeholder="Type corresponding answer...">
+        <button class="action-btn" onclick="injectNewCardDirectly()">⚡ Process & Inject into Code</button>
+    </div>
+
+    <div class="box-group" style="margin-top: 20px;">
+        <label style="color: #a7f3d0;">3. Updated File Content (Ready to Overwrite)</label>
+        <textarea id="finalCompiledOutput" readonly style="height: 120px; color: #10b981;" placeholder="Your updated, full code configuration will mirror here..."></textarea>
+        
+        <button class="action-btn" style="background: #10b981; color: #0f172a; font-size: 1.1rem;" onclick="copyCompiledOutput()">📋 Copy Entire Full File</button>
+        
+        <div id="copyFlashNotification" class="success-flash">Copied Full File! Go to GitHub, select all, and overwrite it. ✅</div>
+    </div>
+</div>
+
+<script>
+    let codeStructureVerified = false;
+
+    function verifyDatabaseStructure() {
+        const rawCodeString = document.getElementById("fileBaseInput").value.trim();
+        const badge = document.getElementById("validationOutput");
+        
+        if (!rawCodeString) {
+            badge.className = "status-badge status-bad";
+            badge.innerText = "Engine State: Offline";
+            codeStructureVerified = false;
+            return;
+        }
+
+        const finalBracketIndex = rawCodeString.lastIndexOf("]");
+
+        if (finalBracketIndex !== -1) {
+            badge.className = "status-badge status-good";
+            const recordsFound = (rawCodeString.match(/question\s*:/g) || []).length;
+            badge.innerText = `Syntax Verified. Count: ${recordsFound} Cards`;
+            codeStructureVerified = true;
+        } else {
+            badge.className = "status-badge status-bad";
+            badge.innerText = "Syntax Warning: Missing closing bracket ']'";
+            codeStructureVerified = false;
+        }
+    }
+
+    function injectNewCardDirectly() {
+        if (!codeStructureVerified) {
+            alert("Please paste your valid questions.js file content into Box 1 first!");
+            return;
+        }
+
+        const qValue = document.getElementById("qInput").value.trim().replace(/"/g, '\\"');
+        const aValue = document.getElementById("aInput").value.trim().replace(/"/g, '\\"');
+
+        if (!qValue || !aValue) {
+            alert("Please fill out both fields!");
+            return;
+        }
+
+        let currentActiveCode = document.getElementById("fileBaseInput").value.trim();
+        const finalBracketIndex = currentActiveCode.lastIndexOf("]");
+        
+        if (finalBracketIndex === -1) return;
+
+        let fileBeforeBracket = currentActiveCode.substring(0, finalBracketIndex).trim();
+        let fileAfterBracket = currentActiveCode.substring(finalBracketIndex).trim();
+
+        if (fileBeforeBracket.length > 0 && !fileBeforeBracket.endsWith(",")) {
+            fileBeforeBracket += ",";
+        }
+
+        const newCardLine = `\n    { question: "${qValue}", answer: "${aValue}" },`;
+        let processMutation = fileBeforeBracket + newCardLine + "\n" + fileAfterBracket;
+
+        // Instantly push the new code to both display boxes
+        document.getElementById("finalCompiledOutput").value = processMutation;
+        document.getElementById("fileBaseInput").value = processMutation;
+        
+        verifyDatabaseStructure();
+
+        // Wipe card input fields so you can type the next one instantly
+        document.getElementById("qInput").value = "";
+        document.getElementById("aInput").value = "";
+    }
+
+    function copyCompiledOutput() {
+        const outStream = document.getElementById("finalCompiledOutput");
+        if (!outStream.value) return;
+        
+        outStream.select();
+        outStream.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(outStream.value);
+        
+        const targetAlert = document.getElementById("copyFlashNotification");
+        targetAlert.style.display = "block";
+        setTimeout(() => { targetAlert.style.display = "none"; }, 4000);
+    }
+</script>
+
+</body>
+</html>
