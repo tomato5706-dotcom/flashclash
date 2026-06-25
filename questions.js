@@ -102,6 +102,5 @@ const decks = {
         { question: "Which major organ pumps blood throughout the human body?", answer: "Heart" },
         { question: "Who is credited with inventing the telephone?", answer: "Alexander Graham Bell" },
         { question: "Which celestial body orbits the Earth?", answer: "The Moon" },
-    { question: "Samuel is who", answer: "Good guy" },
 ]
 };
